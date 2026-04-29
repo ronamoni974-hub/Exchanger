@@ -2,46 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Exchanger | USDT to BDT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crypto Exchanger Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
         :root {
-            --primary: #6366f1;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .container { background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 450px; }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h2 { margin: 0 0 5px 0; color: var(--primary); }
-        .header p { margin: 0; color: var(--text-muted); font-size: 14px; }
-        .rate-box { background: #e0e7ff; color: #4338ca; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body { 
+            background-color: var(--bg-dark); 
+            color: #ffffff; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Live Animated Background Orbs */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 8s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: 10%; left: -10%; width: 250px; height: 250px; background: #4facfe; }
+        .blob-2 { bottom: 10%; right: -10%; width: 300px; height: 300px; background: #667eea; animation-delay: -4s; }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        /* Glassmorphism Container */
+        .glass-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* User Profile Section */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .user-info h3 { font-size: 16px; margin: 0; }
+        .user-info p { font-size: 12px; color: #cbd5e1; margin: 0; display: flex; align-items: center; gap: 5px; }
+        .badge { background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 8px; border-radius: 10px; font-size: 10px; border: 1px solid #34d399; }
+
+        .rate-box { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--primary); padding: 10px; border-radius: 10px; text-align: center; font-weight: 600; margin-bottom: 20px; font-size: 14px; }
+
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; outline: none; transition: border 0.3s; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #e2e8f0; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; transition: 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); background: rgba(255, 255, 255, 0.1); }
+        .form-group select option { background: var(--bg-dark); color: #fff; }
+        
         .amount-container { display: flex; gap: 10px; }
-        .wallet-box { background: #fef2f2; border: 1px dashed #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; color: #991b1b; text-align: center; }
-        .wallet-box span { display: block; font-weight: bold; font-size: 15px; margin-top: 5px; word-break: break-all; }
-        button { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        button:hover { background-color: #4f46e5; }
-        .footer { text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted); }
-        #loading { display: none; text-align: center; margin-top: 10px; color: var(--primary); font-weight: bold; }
+
+        .wallet-box { background: rgba(239, 68, 68, 0.1); border: 1px dashed #ef4444; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 12px; color: #fca5a5; text-align: center; }
+        .wallet-box span { display: block; font-weight: 600; font-size: 14px; margin-top: 5px; color: #fff; word-break: break-all; }
+
+        button {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        #loading { display: none; text-align: center; margin-top: 10px; color: var(--primary); font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>🔄 Fast Exchanger</h2>
-        <p>Exchange your USDT to BDT instantly</p>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="glass-container">
+    <div class="user-profile">
+        <div class="avatar" id="userAvatar">U</div>
+        <div class="user-info">
+            <h3 id="userName">Loading User...</h3>
+            <p>ID: <span id="userId">-------</span> <span class="badge">✅ Verified</span></p>
+        </div>
     </div>
 
     <div class="rate-box">
-        Today's Rate: 1 USDT = <span id="currentRate">118</span> BDT
+        🚀 Today's Rate: 1 USDT = <span id="currentRate">118</span> BDT
     </div>
 
     <form id="exchangeForm">
@@ -52,12 +136,12 @@
             </div>
             <div class="form-group" style="flex: 1;">
                 <label>Get (BDT)</label>
-                <input type="number" id="bdtAmount" readonly style="background: #f3f4f6;">
+                <input type="number" id="bdtAmount" readonly>
             </div>
         </div>
 
         <div class="form-group">
-            <label>Payment Method</label>
+            <label>Receive Payment In</label>
             <select id="paymentMethod" required>
                 <option value="bKash">bKash (Personal)</option>
                 <option value="Nagad">Nagad (Personal)</option>
@@ -67,47 +151,63 @@
 
         <div class="form-group">
             <label>Your Account Number</label>
-            <input type="text" id="accountNumber" placeholder="e.g., 017XXXXXXXX" required>
+            <input type="number" id="accountNumber" placeholder="e.g., 017XXXXXXXX" required>
         </div>
 
         <div class="wallet-box">
-            Send your USDT (TRC20) to this address:
+            Send TRC20 USDT to this address:
             <span>TRC20: TYourAdminWalletAddressHere...</span>
         </div>
 
         <div class="form-group">
-            <label>Transaction ID (TrxID) / Binance Pay ID</label>
+            <label>Transaction ID (TrxID)</label>
             <input type="text" id="trxId" placeholder="Enter TrxID after sending" required>
         </div>
 
-        <button type="submit" id="submitBtn">Submit Request</button>
-        <div id="loading">Processing... Please wait.</div>
+        <button type="submit" id="submitBtn">Confirm Exchange</button>
+        <div id="loading">Verifying & Sending Request...</div>
     </form>
-
-    <div class="footer">
-        Secured & Powered by Your Brand
-    </div>
 </div>
 
 <script>
-    // --- কনফিগারেশন সেটআপ ---
-    const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; // BotFather থেকে পাওয়া টোকেন দিন
-    const CHAT_ID = 'YOUR_CHAT_ID_HERE';     // আপনার টেলিগ্রাম আইডি দিন
+    // --- টেলিগ্রাম ওয়েব অ্যাপ ইনিশিয়ালাইজেশন ---
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // অ্যাপটিকে ফুল-স্ক্রিন করবে
+    
+    // কনফিগারেশন
+    const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; 
+    const ADMIN_CHAT_ID = 'YOUR_CHAT_ID_HERE'; 
     const USDT_RATE = 118;
 
-    document.getElementById('currentRate').innerText = USDT_RATE;
+    // ইউজার ডেটা ফেচ করা (অটো লগইন)
+    let tgUser = tg.initDataUnsafe?.user;
+    
+    if (tgUser) {
+        // টেলিগ্রাম থেকে ইউজারের নাম ও আইডি বসানো
+        const firstName = tgUser.first_name || "User";
+        document.getElementById('userName').innerText = firstName;
+        document.getElementById('userId').innerText = tgUser.id;
+        document.getElementById('userAvatar').innerText = firstName.charAt(0).toUpperCase();
+    } else {
+        // যদি ব্রাউজার থেকে ওপেন করে (টেলিগ্রাম ছাড়া)
+        document.getElementById('userName').innerText = "Web User";
+        document.querySelector('.badge').innerText = "⚠️ Not Telegram";
+        document.querySelector('.badge').style.borderColor = "#f59e0b";
+        document.querySelector('.badge').style.color = "#f59e0b";
+        document.querySelector('.badge').style.background = "rgba(245, 158, 11, 0.2)";
+    }
 
-    // রিয়েল-টাইম অ্যামাউন্ট ক্যালকুলেশন
+    // রিয়েল-টাইম ক্যালকুলেশন
     document.getElementById('usdtAmount').addEventListener('input', function() {
         const usdt = parseFloat(this.value);
-        if(usdt && usdt >= 0) {
+        if(usdt && usdt >= 5) {
             document.getElementById('bdtAmount').value = (usdt * USDT_RATE).toFixed(2);
         } else {
             document.getElementById('bdtAmount').value = '';
         }
     });
 
-    // ফর্ম সাবমিশন হ্যান্ডলিং
+    // ফর্ম সাবমিট
     document.getElementById('exchangeForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -116,27 +216,25 @@
         const method = document.getElementById('paymentMethod').value;
         const account = document.getElementById('accountNumber').value;
         const trxId = document.getElementById('trxId').value;
+        const finalUserId = tgUser ? tgUser.id : "Web";
+        const finalUserName = tgUser ? tgUser.first_name : "Web User";
 
         if (usdt < 5) {
-            alert("Minimum exchange amount is 5 USDT.");
+            tg.showAlert("Minimum exchange amount is 5 USDT.");
             return;
         }
 
-        // বাটন লোডিং স্টেট
         document.getElementById('submitBtn').style.display = 'none';
         document.getElementById('loading').style.display = 'block';
 
-        // টেলিগ্রামের জন্য মেসেজ তৈরি
-        const message = `🔔 *New Web Exchange Request!*\n\n💵 *USDT:* ${usdt}\n৳ *BDT:* ${bdt}\n🏦 *Method:* ${method}\n📱 *Account:* \`${account}\`\n🔑 *TrxID:* \`${trxId}\``;
+        // টেলিগ্রাম বটের মাধ্যমে অ্যাডমিনকে মেসেজ
+        const message = `🔔 *New Mini App Request!*\n\n👤 *User:* ${finalUserName}\n🆔 *Telegram ID:* \`${finalUserId}\`\n\n💵 *USDT:* ${usdt}\n৳ *BDT:* ${bdt}\n🏦 *Method:* ${method}\n📱 *Account:* \`${account}\`\n🔑 *TrxID:* \`${trxId}\``;
 
-        // টেলিগ্রাম API এ রিকোয়েস্ট পাঠানো
         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                chat_id: CHAT_ID,
+                chat_id: ADMIN_CHAT_ID,
                 text: message,
                 parse_mode: 'Markdown'
             })
@@ -144,14 +242,16 @@
         .then(response => response.json())
         .then(data => {
             if(data.ok) {
-                alert("✅ Request submitted successfully! We will send the money soon.");
+                // টেলিগ্রামের নেটিভ পপআপ নোটিফিকেশন
+                tg.showAlert("✅ Request submitted! Admin will process it soon.");
                 document.getElementById('exchangeForm').reset();
+                tg.close(); // রিকোয়েস্ট শেষে মিনি অ্যাপ অটো ক্লোজ হয়ে যাবে
             } else {
-                alert("❌ Failed to send request. Please try again.");
+                tg.showAlert("❌ Failed to send request.");
             }
         })
         .catch(error => {
-            alert("❌ An error occurred. Please check your internet connection.");
+            tg.showAlert("❌ Connection error!");
         })
         .finally(() => {
             document.getElementById('submitBtn').style.display = 'block';
